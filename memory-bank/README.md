@@ -1,80 +1,80 @@
+[![EN](https://img.shields.io/badge/lang-EN-blue?style=flat-square)](README.md) [![VI](https://img.shields.io/badge/lang-VI-lightgrey?style=flat-square)](README.vi.md)
+
 # Memory Bank Pattern
 
----
+## Why do you need Memory Bank?
 
-## Tại sao cần Memory Bank?
+Claude Code has **Auto Memory** — it automatically saves patterns, corrections, and preferences.
+But it's not enough for complex work: it doesn't log decisions with reasoning, doesn't track
+progress on features spanning multiple days, and doesn't know where you are in a task.
 
-Claude Code có **Auto Memory** — tự động lưu patterns, corrections, preferences.
-Nhưng không đủ cho complex work: không lưu decision log có reasoning, không track
-progress của feature đang làm nhiều ngày, không biết bạn đang ở đâu trong task.
-
-Memory Bank giải quyết bằng cách **externalize context ra filesystem** dưới dạng
-markdown files — AI đọc được, người đọc được, commit được lên git.
+Memory Bank solves this by **externalizing context to the filesystem** as markdown files —
+readable by AI, readable by humans, committable to git.
 
 ---
 
-## Cấu trúc
+## Structure
 
 ```
 ~/.claude/skills/
 └── memory-bank/
-    └── skill.md        ← invoke bằng /memory-bank
+    └── skill.md        ← invoke with /memory-bank
 
 your-project/
 └── .claude/
     └── memory/
-        ├── activeContext.md      ← working state hàng ngày    [KHÔNG commit]
-        ├── progress.md           ← decision log               [KHÔNG commit]
-        ├── techStack.md          ← stack + config             [commit]
-        └── systemPatterns.md     ← coding patterns            [commit]
+        ├── activeContext.md      ← daily working state      [do NOT commit]
+        ├── progress.md           ← decision log             [do NOT commit]
+        ├── techStack.md          ← stack + config           [commit]
+        └── systemPatterns.md     ← coding patterns          [commit]
 ```
 
-**Hai file không commit** vì là trạng thái cá nhân — mỗi người có context riêng,
-không nên merge conflict với teammate:
+**Two files are not committed** because they are personal state — each person has their own
+context, and committing them causes merge conflicts with teammates:
 
 ```gitignore
-.claude/memory/activeContext.md   # "tôi đang làm gì hôm nay"
-.claude/memory/progress.md        # "tôi đã quyết định gì trong session này"
+.claude/memory/activeContext.md   # "what am I working on today"
+.claude/memory/progress.md        # "what decisions did I make this session"
 ```
 
-Hai file còn lại commit vì là kiến thức chung của team:
+The other two are committed because they are shared team knowledge:
 
 ```gitignore
-# KHÔNG ignore — commit lên git
-.claude/memory/techStack.md       # stack + config cả team cần biết
-.claude/memory/systemPatterns.md  # coding patterns cả team follow
+# DO NOT ignore — commit to git
+.claude/memory/techStack.md       # stack + config the whole team needs
+.claude/memory/systemPatterns.md  # coding patterns the whole team follows
 ```
 
 ---
 
 ## Setup Skill
 
-Skill content nằm trong file `skill.MD` đi kèm.
+The skill content is in the `skill.MD` file included here.
 
 ```bash
 mkdir -p ~/.claude/skills/memory-bank
 cp skill.MD ~/.claude/skills/memory-bank/skill.md
 ```
 
-Xong. Invoke bằng `/memory-bank <argument>` trong bất kỳ Claude Code session nào.
+Done. Invoke with `/memory-bank <argument>` in any Claude Code session.
 
 ---
 
 ## Daily Workflow — cheat sheet
 
-| Lúc nào | Command | Claude làm gì |
-|---------|---------|---------------|
-| Sáng mở terminal | `/memory-bank start` | Đọc .claude/memory/, briefing 5 dòng |
-| Vừa đưa ra decision | `/memory-bank decision: dùng X vì Y` | Log vào progress.md kèm Why |
-| Phát hiện gotcha | `/memory-bank gotcha: Redis cần prefix order:` | Thêm vào đúng file |
-| Xong 1 task | `/memory-bank done: RefundService.Initiate()` | Tick checkbox |
-| Cuối ngày | `/memory-bank wrapup` | Update tất cả + print summary |
-| Kiểm tra state | `/memory-bank status` | List files + flag stale |
-| Project mới | `/memory-bank init` | Tạo folder + auto-fill từ codebase |
+| When | Command | What Claude does |
+|------|---------|-----------------|
+| Morning | `/memory-bank start` | Reads .claude/memory/, 5-line briefing |
+| After a decision | `/memory-bank decision: use X because Y` | Logs to progress.md with Why |
+| Found a gotcha | `/memory-bank gotcha: Redis needs prefix order:` | Appends to the right file |
+| Finished a task | `/memory-bank done: RefundService.Initiate()` | Ticks checkbox + suggests commit |
+| End of day | `/memory-bank wrapup` | Updates everything + prints summary |
+| Check state | `/memory-bank status` | Lists files + flags stale |
+| New project | `/memory-bank init` | Creates folder + auto-fills from codebase |
 
 ---
 
-## Template 4 files
+## Template — 4 files
 
 ### `.claude/memory/activeContext.md`
 
@@ -98,15 +98,15 @@ Spec: docs/specs/REFUND_SPEC.md
 internal/app/refund_service.go — method Initiate() is incomplete
 
 ## Immediate Next Step
-1. Validate order ở status "delivered"
-2. Call payment-service gRPC để reverse charge
-3. Write refund record + update order status trong ONE transaction
-4. Publish OrderRefunded event lên Kafka
+1. Validate order at status "delivered"
+2. Call payment-service gRPC to reverse charge
+3. Write refund record + update order status in ONE transaction
+4. Publish OrderRefunded event to Kafka
 
 ## Blockers / Open Questions
-- payment-service gRPC method: ReverseCharge hay CreateRefund?
-  → Xem: internal/proto/payment/v1/payment.proto
-- Refund sau 30 ngày có được không? → Đang chờ PM. Assume NO.
+- payment-service gRPC method: ReverseCharge or CreateRefund?
+  → See: internal/proto/payment/v1/payment.proto
+- Can we refund after 30 days? → Waiting on PM. Assume NO.
 ```
 
 ---
@@ -119,21 +119,21 @@ internal/app/refund_service.go — method Initiate() is incomplete
 ## Decisions Made
 
 ### 2025-06-14: Refund storage strategy
-**Decision:** Separate `refunds` table, KHÔNG dùng status column trên orders.
-**Why:** Một order có thể có multiple partial refunds. Cần aggregate amounts.
+**Decision:** Separate `refunds` table, NOT a status column on orders.
+**Why:** An order can have multiple partial refunds. Need to aggregate amounts.
 **Alternatives rejected:**
-- JSONB column on orders: query performance kém khi aggregate
-- orders_history table: quá generic, không enforce refund constraints
+- JSONB column on orders: poor query performance when aggregating
+- orders_history table: too generic, doesn't enforce refund constraints
 
-### 2025-06-13: gRPC vs REST cho payment-service
-**Decision:** gRPC, không tạo REST endpoint mới.
-**Why:** Consistency với existing pattern. payment-service đã có gRPC server.
+### 2025-06-13: gRPC vs REST for payment-service
+**Decision:** gRPC, not a new REST endpoint.
+**Why:** Consistency with existing pattern. payment-service already has a gRPC server.
 
 ## What Didn't Work
 
-### Attempted: Dùng OrderRepository.Update() cho status change
-**Problem:** Cập nhật ALL fields → race condition với concurrent requests.
-**Solution:** Thêm UpdateStatus(ctx, id, newStatus, expectedStatus) với optimistic locking.
+### Attempted: Using OrderRepository.Update() for status change
+**Problem:** Updates ALL fields → race condition with concurrent requests.
+**Solution:** Added UpdateStatus(ctx, id, newStatus, expectedStatus) with optimistic locking.
 ```
 
 ---
@@ -160,8 +160,8 @@ internal/app/refund_service.go — method Initiate() is incomplete
 
 ## Non-obvious Config
 - PgPool max connections: 20 → internal/infra/db/pool.go
-- Redis key prefix bắt buộc: "order:" → internal/infra/cache/keys.go
-- Kafka consumer group: "order-service-v2" (v1 deprecated, đừng dùng)
+- Redis key prefix required: "order:" → internal/infra/cache/keys.go
+- Kafka consumer group: "order-service-v2" (v1 deprecated, do not use)
 - gRPC max message size: 4MB default
 
 ## Local Development
@@ -185,23 +185,23 @@ Optional: LOG_LEVEL (default: info), PORT (default: 8080)
 
 ## Error Handling
 ```go
-// LUÔN wrap với context: "FunctionName: %w"
+// ALWAYS wrap with context: "FunctionName: %w"
 return fmt.Errorf("RefundService.Initiate: %w", err)
-// Custom errors tại internal/domain/errors.go
-// Dùng errors.As để unwrap ở handler layer
+// Custom errors at internal/domain/errors.go
+// Use errors.As to unwrap at handler layer
 ```
 
 ## Repository Pattern
 ```go
-// Interface ở domain layer (internal/domain/)
-// Implementation ở infra layer (internal/infra/)
-// Tests dùng in-memory impl, KHÔNG dùng sqlmock
+// Interface at domain layer (internal/domain/)
+// Implementation at infra layer (internal/infra/)
+// Tests use in-memory impl, NOT sqlmock
 ```
 
 ## Context Propagation
 ```go
-// context.Context LUÔN là tham số đầu tiên
-// KHÔNG dùng context.Background() trong handlers
+// context.Context is ALWAYS the first parameter
+// Do NOT use context.Background() in handlers
 // Propagate: r.Context()
 ```
 
@@ -212,31 +212,31 @@ slog.InfoContext(ctx, "refund.initiated",
     "amount_cents", amountCents,
 )
 // Format: "domain.action" — lowercase, dot-separated
-// KHÔNG dùng fmt.Println, log.Printf
+// Do NOT use fmt.Println, log.Printf
 ```
 
 ## Testing
-- Unit: cùng package, không cần Docker
+- Unit: same package, no Docker needed
 - Integration: build tag `//go:build integration`
-- Dùng testcontainers cho PostgreSQL thật, KHÔNG sqlmock
+- Use testcontainers for real PostgreSQL, NOT sqlmock
 ````
 
 ---
 
-## Hướng dẫn từng bước — từ khi khởi tạo project
+## Step-by-step Guide
 
-### Bước 1: Cài skill — một lần duy nhất
+### Step 1: Install the skill — once only
 
 ```bash
 mkdir -p ~/.claude/skills/memory-bank
 cp skill.MD ~/.claude/skills/memory-bank/skill.md
 ```
 
-Xong. Skill tồn tại mãi, dùng cho mọi project.
+Done. The skill persists forever, works for every project.
 
 ---
 
-### Bước 2: Khởi tạo project mới
+### Step 2: Initialize a new project
 
 ```bash
 cd your-project
@@ -244,25 +244,25 @@ claude
 > /init
 ```
 
-Sau khi `/init` xong, edit `CLAUDE.md` — bổ sung thủ công **Critical Business Rules**
-và **Known Gotchas** mà AI không đoán được từ code.
+After `/init`, edit `CLAUDE.md` — manually add **Critical Business Rules**
+and **Known Gotchas** that the AI can't infer from code.
 
 ---
 
-### Bước 3: Khởi tạo Memory Bank
+### Step 3: Initialize Memory Bank
 
-Vẫn trong session đó:
+Still in the same session:
 
 ```
 > /memory-bank init
 ```
 
-Claude sẽ tự:
-- Tạo `.claude/memory/` folder + 4 files
-- Điền `techStack.md` và `systemPatterns.md` từ codebase
-- Tạo skeleton cho `activeContext.md` và `progress.md`
+Claude will:
+- Create `.claude/memory/` folder + 4 files
+- Fill in `techStack.md` and `systemPatterns.md` from the codebase
+- Create skeletons for `activeContext.md` and `progress.md`
 
-Sau khi xong, Claude output:
+When done, Claude outputs:
 
 ```
 ✓ Memory Bank initialized.
@@ -283,35 +283,33 @@ Review these two files once done — they're what I detected from code:
 Add any business rules or gotchas I couldn't detect from code.
 ```
 
-Chọn **Y** (khuyến nghị) để Claude tự append vào `.gitignore`. Chọn **n** nếu repo là personal project hoặc bạn tự quản lý `.gitignore`.
-
-Review lại output — bổ sung những gì AI bỏ sót, đặc biệt là business rules.
+Choose **Y** (recommended) to let Claude append to `.gitignore`. Choose **n** for personal projects or if you manage `.gitignore` yourself.
 
 ---
 
-### Bước 4: Commit initial state
+### Step 4: Commit initial state
 
 ```bash
 git add CLAUDE.md .claude/memory/techStack.md .claude/memory/systemPatterns.md .gitignore
 git commit -m "docs: init memory bank"
 ```
 
-`activeContext.md` và `progress.md` không commit — personal state, chỉ dùng cá nhân.
-Nếu đã chọn Y ở bước trước thì `.gitignore` đã tự handle rồi.
+`activeContext.md` and `progress.md` are not committed — personal state only.
+If you chose Y above, `.gitignore` already handles this.
 
 ---
 
-### Bước 5: Ngày đầu tiên làm việc
+### Step 5: First day of work
 
 ```
 > /memory-bank start
 ```
 
-Lần đầu ra briefing trống. Set task mới:
+First time outputs an empty briefing. Set a new task:
 
 ```
-> Tôi sẽ implement refund flow. Spec ở docs/REFUND_SPEC.md.
-  Các task:
+> I'll implement the refund flow. Spec at docs/REFUND_SPEC.md.
+  Tasks:
   - RefundRepository interface
   - Migration
   - RefundService.Initiate()
@@ -319,59 +317,59 @@ Lần đầu ra briefing trống. Set task mới:
   - HTTP handler
 ```
 
-Claude điền vào `activeContext.md` rồi confirm "✓ Task logged. Ready to start — just say go."
-Sau khi xác nhận, Claude mới bắt đầu làm.
+Claude fills in `activeContext.md` then confirms "✓ Task logged. Ready to start — just say go."
+Only after you confirm does Claude begin working.
 
 ---
 
-### Bước 6: Trong ngày — khi có decision
+### Step 6: During the day — when you make a decision
 
 ```
-> /memory-bank decision: dùng separate refunds table thay vì JSONB column
-  vì một order có thể có multiple partial refunds, cần aggregate amounts
+> /memory-bank decision: use separate refunds table instead of JSONB column
+  because an order can have multiple partial refunds, need to aggregate amounts
 ```
 
-Nếu thiếu Why, Claude sẽ hỏi trước khi log.
+If Why is missing, Claude will ask before logging.
 
 ---
 
-### Bước 7: Trong ngày — khi phát hiện gotcha
+### Step 7: During the day — when you find a gotcha
 
 ```
-> /memory-bank gotcha: pgx/v5 không dùng database/sql, import pgx trực tiếp
+> /memory-bank gotcha: pgx/v5 doesn't use database/sql, import pgx directly
 ```
 
-Claude tự quyết định file phù hợp (`techStack.md`) và append vào.
+Claude decides which file to append to (`techStack.md`) and adds it.
 
 ---
 
-### Bước 8: Xong một task nhỏ
+### Step 8: Finished a small task
 
 ```
 > /memory-bank done: RefundRepository interface
 ```
 
-Claude tick checkbox trong `activeContext.md`.
+Claude ticks the checkbox in `activeContext.md` and suggests a commit message.
 
 ---
 
-### Bước 9: Cuối ngày
+### Step 9: End of day
 
 ```
 > /memory-bank wrapup
 ```
 
-Claude update tất cả files + print summary. Đọc summary, confirm đúng, rồi:
+Claude updates all files + prints a summary. Review it, then:
 
 ```bash
-# Chỉ commit nếu techStack hoặc systemPatterns thay đổi
+# Only commit if techStack or systemPatterns changed
 git add .claude/memory/techStack.md .claude/memory/systemPatterns.md
 git commit -m "docs: update memory bank"
 ```
 
 ---
 
-### Bước 10: Sáng hôm sau
+### Step 10: Next morning
 
 ```bash
 cd your-project
@@ -379,30 +377,30 @@ claude
 > /memory-bank start
 ```
 
-Nhận briefing, tiếp tục từ đúng chỗ hôm qua dừng. Không cần nhớ gì cả.
+Get briefing, continue from exactly where you left off. No need to remember anything.
 
 ---
 
-### Vòng lặp hàng ngày
+### Daily loop
 
 ```
-Sáng:    /memory-bank start
-Làm:     /memory-bank decision: ...
-         /memory-bank gotcha: ...
-         /memory-bank done: ...
-Tối:     /memory-bank wrapup
-         git add + commit (nếu cần)
+Morning:  /memory-bank start
+During:   /memory-bank decision: ...
+          /memory-bank gotcha: ...
+          /memory-bank done: ...
+Evening:  /memory-bank wrapup
+          git add + commit (if needed)
 ```
 
 ---
 
-## Commit định kỳ
+## Periodic commits
 
 ```bash
-# techStack và systemPatterns là team knowledge → commit
+# techStack and systemPatterns are team knowledge → commit
 git add CLAUDE.md .claude/memory/techStack.md .claude/memory/systemPatterns.md
 git commit -m "docs: update memory bank"
 
-# activeContext và progress là personal state → KHÔNG commit
-# (đã có trong .gitignore)
+# activeContext and progress are personal state → do NOT commit
+# (already in .gitignore)
 ```
