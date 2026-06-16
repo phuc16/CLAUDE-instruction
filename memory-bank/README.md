@@ -21,28 +21,39 @@ markdown files — AI đọc được, người đọc được, commit được
     └── skill.md        ← invoke bằng /memory-bank
 
 your-project/
-└── memory/
-    ├── activeContext.md      ← working state hàng ngày    [KHÔNG commit]
-    ├── progress.md           ← decision log               [KHÔNG commit]
-    ├── techStack.md          ← stack + config             [commit]
-    └── systemPatterns.md     ← coding patterns            [commit]
+└── .claude/
+    └── memory/
+        ├── activeContext.md      ← working state hàng ngày    [KHÔNG commit]
+        ├── progress.md           ← decision log               [KHÔNG commit]
+        ├── techStack.md          ← stack + config             [commit]
+        └── systemPatterns.md     ← coding patterns            [commit]
 ```
 
-**.gitignore:**
+**Hai file không commit** vì là trạng thái cá nhân — mỗi người có context riêng,
+không nên merge conflict với teammate:
+
 ```gitignore
-memory/activeContext.md
-memory/progress.md
+.claude/memory/activeContext.md   # "tôi đang làm gì hôm nay"
+.claude/memory/progress.md        # "tôi đã quyết định gì trong session này"
+```
+
+Hai file còn lại commit vì là kiến thức chung của team:
+
+```gitignore
+# KHÔNG ignore — commit lên git
+.claude/memory/techStack.md       # stack + config cả team cần biết
+.claude/memory/systemPatterns.md  # coding patterns cả team follow
 ```
 
 ---
 
 ## Setup Skill
 
-Skill content nằm trong file `memory-bank-skill.md` đi kèm.
+Skill content nằm trong file `skill.MD` đi kèm.
 
 ```bash
 mkdir -p ~/.claude/skills/memory-bank
-cp memory-bank-skill.md ~/.claude/skills/memory-bank/skill.md
+cp skill.MD ~/.claude/skills/memory-bank/skill.md
 ```
 
 Xong. Invoke bằng `/memory-bank <argument>` trong bất kỳ Claude Code session nào.
@@ -53,7 +64,7 @@ Xong. Invoke bằng `/memory-bank <argument>` trong bất kỳ Claude Code sessi
 
 | Lúc nào | Command | Claude làm gì |
 |---------|---------|---------------|
-| Sáng mở terminal | `/memory-bank start` | Đọc memory/, briefing 5 dòng |
+| Sáng mở terminal | `/memory-bank start` | Đọc .claude/memory/, briefing 5 dòng |
 | Vừa đưa ra decision | `/memory-bank decision: dùng X vì Y` | Log vào progress.md kèm Why |
 | Phát hiện gotcha | `/memory-bank gotcha: Redis cần prefix order:` | Thêm vào đúng file |
 | Xong 1 task | `/memory-bank done: RefundService.Initiate()` | Tick checkbox |
@@ -65,7 +76,7 @@ Xong. Invoke bằng `/memory-bank <argument>` trong bất kỳ Claude Code sessi
 
 ## Template 4 files
 
-### `memory/activeContext.md`
+### `.claude/memory/activeContext.md`
 
 ```markdown
 # Active Context
@@ -100,7 +111,7 @@ internal/app/refund_service.go — method Initiate() is incomplete
 
 ---
 
-### `memory/progress.md`
+### `.claude/memory/progress.md`
 
 ```markdown
 # Progress & Decisions
@@ -127,7 +138,7 @@ internal/app/refund_service.go — method Initiate() is incomplete
 
 ---
 
-### `memory/techStack.md`
+### `.claude/memory/techStack.md`
 
 ```markdown
 # Tech Stack
@@ -167,7 +178,7 @@ Optional: LOG_LEVEL (default: info), PORT (default: 8080)
 
 ---
 
-### `memory/systemPatterns.md`
+### `.claude/memory/systemPatterns.md`
 
 ````markdown
 # System Patterns
@@ -218,7 +229,7 @@ slog.InfoContext(ctx, "refund.initiated",
 
 ```bash
 mkdir -p ~/.claude/skills/memory-bank
-cp memory-bank-skill.md ~/.claude/skills/memory-bank/skill.md
+cp skill.MD ~/.claude/skills/memory-bank/skill.md
 ```
 
 Xong. Skill tồn tại mãi, dùng cho mọi project.
@@ -247,10 +258,32 @@ Vẫn trong session đó:
 ```
 
 Claude sẽ tự:
-- Tạo `memory/` folder + 4 files
+- Tạo `.claude/memory/` folder + 4 files
 - Điền `techStack.md` và `systemPatterns.md` từ codebase
 - Tạo skeleton cho `activeContext.md` và `progress.md`
-- Append 2 dòng vào `.gitignore`
+
+Sau khi xong, Claude output:
+
+```
+✓ Memory Bank initialized.
+
+Add personal state files to .gitignore?
+(activeContext.md and progress.md — these are yours alone, not for teammates)
+
+Y (recommended) — append to .gitignore (prevents merge conflicts when teammates each update their own "current task")
+                  These files track your personal working state — not meant to be shared.
+n — skip (fine for a personal/solo repo, or if you prefer to manage .gitignore yourself)
+
+---
+Review these two files once done — they're what I detected from code:
+
+- .claude/memory/techStack.md — ...
+- .claude/memory/systemPatterns.md — ...
+
+Add any business rules or gotchas I couldn't detect from code.
+```
+
+Chọn **Y** (khuyến nghị) để Claude tự append vào `.gitignore`. Chọn **n** nếu repo là personal project hoặc bạn tự quản lý `.gitignore`.
 
 Review lại output — bổ sung những gì AI bỏ sót, đặc biệt là business rules.
 
@@ -259,11 +292,12 @@ Review lại output — bổ sung những gì AI bỏ sót, đặc biệt là bu
 ### Bước 4: Commit initial state
 
 ```bash
-git add CLAUDE.md memory/techStack.md memory/systemPatterns.md .gitignore
+git add CLAUDE.md .claude/memory/techStack.md .claude/memory/systemPatterns.md .gitignore
 git commit -m "docs: init memory bank"
 ```
 
-`activeContext.md` và `progress.md` không commit — đã có trong `.gitignore`.
+`activeContext.md` và `progress.md` không commit — personal state, chỉ dùng cá nhân.
+Nếu đã chọn Y ở bước trước thì `.gitignore` đã tự handle rồi.
 
 ---
 
@@ -285,11 +319,8 @@ Lần đầu ra briefing trống. Set task mới:
   - HTTP handler
 ```
 
-Claude điền vào `activeContext.md`. Kiểm tra:
-
-```
-> /memory-bank status
-```
+Claude điền vào `activeContext.md` rồi confirm "✓ Task logged. Ready to start — just say go."
+Sau khi xác nhận, Claude mới bắt đầu làm.
 
 ---
 
@@ -334,7 +365,7 @@ Claude update tất cả files + print summary. Đọc summary, confirm đúng, 
 
 ```bash
 # Chỉ commit nếu techStack hoặc systemPatterns thay đổi
-git add memory/techStack.md memory/systemPatterns.md
+git add .claude/memory/techStack.md .claude/memory/systemPatterns.md
 git commit -m "docs: update memory bank"
 ```
 
@@ -369,7 +400,7 @@ Tối:     /memory-bank wrapup
 
 ```bash
 # techStack và systemPatterns là team knowledge → commit
-git add CLAUDE.md memory/techStack.md memory/systemPatterns.md
+git add CLAUDE.md .claude/memory/techStack.md .claude/memory/systemPatterns.md
 git commit -m "docs: update memory bank"
 
 # activeContext và progress là personal state → KHÔNG commit

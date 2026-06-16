@@ -4,7 +4,7 @@ argument-hint: <start|decision:<text>|gotcha:<text>|done:<task>|wrapup|status|in
 ---
 
 You are managing the Memory Bank for this project.
-The Memory Bank lives in the `memory/` folder at the project root.
+The Memory Bank lives in the `.claude/memory/` folder at the project root.
 Act based on $ARGUMENTS:
 
 ---
@@ -12,10 +12,10 @@ Act based on $ARGUMENTS:
 ## start
 
 Read ALL memory files in this order (skip if file doesn't exist):
-1. memory/activeContext.md
-2. memory/progress.md
-3. memory/systemPatterns.md
-4. memory/techStack.md
+1. .claude/memory/activeContext.md
+2. .claude/memory/progress.md
+3. .claude/memory/systemPatterns.md
+4. .claude/memory/techStack.md
 
 Then output a briefing in this exact format — nothing else before it:
 
@@ -27,13 +27,23 @@ Then output a briefing in this exact format — nothing else before it:
 
 Then ask: "Ready to continue?"
 
-If memory/ doesn't exist: reply "No Memory Bank found. Run `/memory-bank init` to initialize."
+**IMPORTANT — after the briefing, if the user describes a new task or pastes an error/issue:**
+DO NOT start fixing or investigating yet.
+First, write the task into .claude/memory/activeContext.md:
+- Set "## Current Task" to a 1-line summary of what the user described
+- Under "## Exactly Where I Am", add checklist items for the subtasks you can infer
+- Set "## Immediate Next Step" to the first concrete action
+- Update "Last updated" timestamp
+Then confirm: "✓ Task logged. Ready to start — just say go."
+Only begin actual work after the user confirms.
+
+If .claude/memory/ doesn't exist: reply "No Memory Bank found. Run `/memory-bank init` to initialize."
 
 ---
 
 ## decision:<text>
 
-Append to memory/progress.md:
+Append to .claude/memory/progress.md:
 
 ### [today's date]: [extract a short title from <text>]
 **Decision:** [<text>]
@@ -46,22 +56,27 @@ Then confirm: "✓ Logged to progress.md"
 
 ## gotcha:<text>
 
-1. Append to memory/activeContext.md under "## Blockers / Open Questions":
+1. Append to .claude/memory/activeContext.md under "## Blockers / Open Questions":
    - [<text>]
-2. If <text> is about stack config or versions → also append to memory/techStack.md
-3. If <text> is about a coding pattern → also append to memory/systemPatterns.md
+2. If <text> is about stack config or versions → also append to .claude/memory/techStack.md
+3. If <text> is about a coding pattern → also append to .claude/memory/systemPatterns.md
 4. Confirm which file(s) were updated: "✓ Logged to [files]"
 
 ---
 
 ## done:<task>
 
-In memory/activeContext.md:
+In .claude/memory/activeContext.md:
 - Find the line containing <task> under "## Exactly Where I Am"
 - Change `- [ ]` to `- [x]`
 - Update "Last updated" timestamp to today
 
 Confirm: "✓ Checked off: <task>"
+
+Then suggest a commit message based on what was just completed:
+```
+git commit -m "<verb>: <what was done>"
+```
 
 ---
 
@@ -69,14 +84,14 @@ Confirm: "✓ Checked off: <task>"
 
 Do ALL of these steps in order:
 
-**Step 1 — Update memory/activeContext.md:**
+**Step 1 — Update .claude/memory/activeContext.md:**
 - Check off all items completed this session
 - Update "Current File Being Worked On" to the actual current file
 - Rewrite "Immediate Next Step" to be the very next concrete action
 - Add any new blockers discovered this session
 - Update "Last updated" timestamp
 
-**Step 2 — Append to memory/progress.md:**
+**Step 2 — Append to .claude/memory/progress.md:**
 - Any decisions made this session (format: Decision → Why → Alternatives rejected)
 - Any "what didn't work" discoveries
 
@@ -88,15 +103,20 @@ Do ALL of these steps in order:
 ⏭️  Next session starts at: [exact next step, copy from activeContext]
 💡 Decisions logged: [N] new entries
 
-**Step 4 — Remind:**
+**Step 4 — Suggest a commit message** based on all completed items this session:
+```
+git commit -m "<verb>: <summary of what was done>"
+```
+
+**Step 5 — Remind:**
 "Run this if stack or patterns changed:
-git add CLAUDE.md memory/techStack.md memory/systemPatterns.md"
+git add CLAUDE.md .claude/memory/techStack.md .claude/memory/systemPatterns.md"
 
 ---
 
 ## status
 
-1. List all files in memory/ with last-modified dates
+1. List all files in .claude/memory/ with last-modified dates
 2. Flag any file not updated in > 7 days as "⚠️ possibly stale"
 3. Run /memory to show what Claude currently has loaded
 
@@ -106,23 +126,20 @@ git add CLAUDE.md memory/techStack.md memory/systemPatterns.md"
 
 Create the Memory Bank from scratch:
 
-1. Create memory/ folder if not exists
-2. Create 4 files: memory/activeContext.md, memory/progress.md,
-   memory/techStack.md, memory/systemPatterns.md
-3. Append to .gitignore (don't overwrite):
-   memory/activeContext.md
-   memory/progress.md
-4. Read the codebase and fill in memory/techStack.md:
+1. Create .claude/memory/ folder if not exists
+2. Create 4 files: .claude/memory/activeContext.md, .claude/memory/progress.md,
+   .claude/memory/techStack.md, .claude/memory/systemPatterns.md
+3. Read the codebase and fill in .claude/memory/techStack.md:
    - Detect languages, frameworks, libraries with versions
    - Note non-obvious config (connection limits, key prefixes, deprecated items)
    - Add local dev commands (how to run, test, connect to DB/cache)
    - Add required environment variables
-5. Read the codebase and fill in memory/systemPatterns.md:
+4. Read the codebase and fill in .claude/memory/systemPatterns.md:
    - Detect error handling pattern
    - Detect repository/service layer pattern
    - Detect logging convention
    - Detect testing convention
-6. Write skeleton into memory/activeContext.md:
+5. Write skeleton into .claude/memory/activeContext.md:
    # Active Context
    Last updated: [today]
    ## Current Task
@@ -135,12 +152,29 @@ Create the Memory Bank from scratch:
    [not set]
    ## Blockers / Open Questions
    [none]
-7. Write skeleton into memory/progress.md:
+6. Write skeleton into .claude/memory/progress.md:
    # Progress & Decisions
    ## Decisions Made
    [none yet]
    ## What Didn't Work
    [none yet]
-8. Confirm: "✓ Memory Bank initialized.
-   Review memory/techStack.md and memory/systemPatterns.md —
-   add business rules and gotchas that I couldn't detect from code."
+7. Output exactly:
+
+   ✓ Memory Bank initialized.
+
+   Add personal state files to .gitignore?
+   (activeContext.md and progress.md — these are yours alone, not for teammates)
+
+   Y (recommended) — append to .gitignore (prevents merge conflicts when teammates each update their own "current task")
+                     These files track your personal working state — not meant to be shared.
+   n — skip (fine for a personal/solo repo, or if you prefer to manage .gitignore yourself)
+
+   ---
+   Review these two files once done — they're what I detected from code:
+
+   - .claude/memory/techStack.md — [one-line summary of what was detected]
+   - .claude/memory/systemPatterns.md — [one-line summary of what was detected]
+
+   Add any business rules or gotchas I couldn't detect from code.
+
+   Then wait for Y/n and append to .gitignore if Y.

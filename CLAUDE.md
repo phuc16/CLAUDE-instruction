@@ -11,7 +11,7 @@ This repository stores Vietnamese-language guides for Claude Code best practices
 
 ## Memory Bank Pattern (summary)
 
-The Memory Bank lives in `memory/` at the project root — four files:
+The Memory Bank lives in `.claude/memory/` at the project root — four files:
 
 | File | Committed | Purpose |
 |---|---|---|

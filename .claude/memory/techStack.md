@@ -17,5 +17,5 @@ Pure documentation — no package manager, no build step, no test runner.
 
 ## Git
 - Branch: `main`
-- `.gitignore`: excludes `memory/activeContext.md` and `memory/progress.md`
+- `.gitignore`: excludes `.claude/memory/activeContext.md` and `.claude/memory/progress.md`
 - Commit sharable docs (`techStack.md`, `systemPatterns.md`, `CLAUDE.md`), not personal state files
