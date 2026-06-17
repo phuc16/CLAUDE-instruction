@@ -43,3 +43,7 @@
 
 ### 2026-06-16: Single-file language switching with GitHub anchors
 `<a name="english">` anchors before headings — GitHub sanitizer strips `name` attribute, links do nothing. Heading-based anchors (`## English`) work for scrolling but both sections show simultaneously.
+
+### 2026-06-17: Conventional Commits format for skill commit suggestions
+**Decision:** `done:` and `wrapup` Step 4 now suggest commits using `<type>[scope]: <description>` + optional body, with types cheatsheet (`feat fix docs refactor perf test chore ci`) inline.
+**Why:** Previous format (`<verb>: <what was done>`) was free-form with no semantic meaning — couldn't drive changelog generation or CI triggers. Conventional Commits is the de-facto standard for this.

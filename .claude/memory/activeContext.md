@@ -1,20 +1,15 @@
 # Active Context
 
-Last updated: 2026-06-16
+Last updated: 2026-06-17
 
 ## Current Task
 [not set]
 
 ## Exactly Where I Am
-- [x] Đa ngôn ngữ cho các README (EN + VI)
-  - [x] Quyết định cấu trúc: tách thành nhiều file (README.md EN mặc định, README.vi.md VI)
-  - [x] memory-bank/README.md (EN)
-  - [x] memory-bank/README.vi.md (VI)
-  - [x] project-claude/README.md (EN)
-  - [x] project-claude/README.vi.md (VI)
-  - [x] Root README.md (EN, giới thiệu repo)
-  - [x] Root README.vi.md (VI)
-  - [x] Badges shields.io EN/VI ở đầu mỗi file (active = blue, inactive = lightgrey)
+- [x] Cập nhật skill `done:` — thay template commit bằng Conventional Commits format
+- [x] Cập nhật skill `wrapup` Step 4 — tương tự
+- [x] Sync `memory-bank/skill.MD` (repo source) với installed skill
+- [x] Kiểm tra các commit suggestion mẫu đã dùng trong session trước có cần update gì không
 
 ## Current File Being Worked On
 [none]

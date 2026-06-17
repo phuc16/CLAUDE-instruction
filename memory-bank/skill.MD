@@ -73,10 +73,14 @@ In .claude/memory/activeContext.md:
 
 Confirm: "✓ Checked off: <task>"
 
-Then suggest a commit message based on what was just completed:
+Then suggest a commit message based on what was just completed, using Conventional Commits format:
 ```
-git commit -m "<verb>: <what was done>"
+git commit -m "<type>[optional scope]: <description>
+
+[optional body — what changed and why, if non-obvious]"
 ```
+Types: `feat` `fix` `docs` `refactor` `perf` `test` `chore` `ci`
+Use `feat!` or add `BREAKING CHANGE:` in footer for breaking changes.
 
 ---
 
@@ -103,10 +107,14 @@ Do ALL of these steps in order:
 ⏭️  Next session starts at: [exact next step, copy from activeContext]
 💡 Decisions logged: [N] new entries
 
-**Step 4 — Suggest a commit message** based on all completed items this session:
+**Step 4 — Suggest a commit message** based on all completed items this session, using Conventional Commits format:
 ```
-git commit -m "<verb>: <summary of what was done>"
+git commit -m "<type>[optional scope]: <description>
+
+[optional body — what changed and why, if non-obvious]"
 ```
+Types: `feat` `fix` `docs` `refactor` `perf` `test` `chore` `ci`
+Use `feat!` or add `BREAKING CHANGE:` in footer for breaking changes.
 
 **Step 5 — Remind:**
 "Run this if stack or patterns changed:
