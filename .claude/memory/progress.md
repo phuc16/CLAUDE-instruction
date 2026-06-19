@@ -39,15 +39,14 @@
 **Decision:** Both language badges (EN + VI) are always visible at top of every README. Active language = blue, inactive = lightgrey.
 **Why:** User wants both badges visible at all times (not just the "other" language). shields.io `flat-square` style matches GitHub markdown aesthetic.
 
+### 2026-06-17: Conventional Commits format for skill commit suggestions
+**Decision:** `done:` and `wrapup` Step 4 now suggest commits using `<type>[scope]: <description>` + optional body, with types cheatsheet (`feat fix docs refactor perf test chore ci`) inline.
+**Why:** Previous format (`<verb>: <what was done>`) was free-form with no semantic meaning — couldn't drive changelog generation or CI triggers. Conventional Commits is the de-facto standard for this.
+
 ### 2026-06-19: spec-generator skill output format
 **Decision:** skill takes a free-form feature request and outputs 4 fixed sections: Acceptance Criteria → Edge Cases → Risk Analysis → Task Breakdown.
 **Why:** User-specified format — covers the full pre-development spec cycle in one invocation without needing multiple prompts.
 
 ## What Didn't Work
 
-### 2026-06-16: Single-file language switching with GitHub anchors
-`<a name="english">` anchors before headings — GitHub sanitizer strips `name` attribute, links do nothing. Heading-based anchors (`## English`) work for scrolling but both sections show simultaneously.
-
-### 2026-06-17: Conventional Commits format for skill commit suggestions
-**Decision:** `done:` and `wrapup` Step 4 now suggest commits using `<type>[scope]: <description>` + optional body, with types cheatsheet (`feat fix docs refactor perf test chore ci`) inline.
-**Why:** Previous format (`<verb>: <what was done>`) was free-form with no semantic meaning — couldn't drive changelog generation or CI triggers. Conventional Commits is the de-facto standard for this.
+[none]
