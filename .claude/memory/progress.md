@@ -39,6 +39,10 @@
 **Decision:** Both language badges (EN + VI) are always visible at top of every README. Active language = blue, inactive = lightgrey.
 **Why:** User wants both badges visible at all times (not just the "other" language). shields.io `flat-square` style matches GitHub markdown aesthetic.
 
+### 2026-06-19: spec-generator skill output format
+**Decision:** skill takes a free-form feature request and outputs 4 fixed sections: Acceptance Criteria → Edge Cases → Risk Analysis → Task Breakdown.
+**Why:** User-specified format — covers the full pre-development spec cycle in one invocation without needing multiple prompts.
+
 ## What Didn't Work
 
 ### 2026-06-16: Single-file language switching with GitHub anchors

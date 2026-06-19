@@ -16,7 +16,7 @@ Author a new Claude Code skill: `spec-generator`
 ~/.claude/skills/spec-generator/skill.md
 
 ## Immediate Next Step
-[not set]
+Write spec-generator.MD guide doc for the repo (parallel to memory-bank.MD)
 
 ## Blockers / Open Questions
 [none]
