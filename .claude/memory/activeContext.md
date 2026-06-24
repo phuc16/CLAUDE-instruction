@@ -1,22 +1,21 @@
 # Active Context
 
-Last updated: 2026-06-19
+Last updated: 2026-06-24
 
 ## Current Task
-Author a new Claude Code skill: `spec-generator`
+[not set]
 
 ## Exactly Where I Am
-- [x] Define skill purpose, commands, and UX flow
-- [x] Draft skill.md content
-- [x] Install skill to ~/.claude/skills/spec-generator/skill.md
-- [x] Add skill entry to this repo (alongside memory-bank.MD)
-- [x] Test invocation via /spec-generator
+- [x] Convert memory-bank skill to Claude Code plugin
+- [x] Install via phuc16/CLAUDE-instruction marketplace
+- [x] Update all repo docs to reflect new plugin format
+- [x] Update memory files (systemPatterns, techStack) to remove stale references
 
 ## Current File Being Worked On
-~/.claude/skills/spec-generator/skill.md
+memory-bank/skills/
 
 ## Immediate Next Step
-Write spec-generator.MD guide doc for the repo (parallel to memory-bank.MD)
+Monitor /memory-bank:* commands in real projects; consider standalone repo if unprefixed /using-memory-bank is needed
 
 ## Blockers / Open Questions
-[none]
+- Plugin commands from subdirectory installs are prefixed (e.g. /memory-bank:using-memory-bank instead of /using-memory-bank) — requires standalone repo to fix

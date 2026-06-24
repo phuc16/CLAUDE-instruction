@@ -2,6 +2,21 @@
 
 ## Decisions Made
 
+### 2026-06-24: Convert memory-bank to Claude Code plugin
+**Decision:** Restructure memory-bank from a single `skill.MD` file into a proper plugin with per-operation skills, hosted at `phuc16/CLAUDE-instruction` as a marketplace.
+**Why:** Plugin format enables `/plugin install`, auto-updates via `/plugin update`, and the agent-skills-style `/memory-bank:<op>` invocation pattern. Skill files are isolated per operation for easier editing.
+**Alternatives rejected:** Keep as skills-dir file (no auto-update, manual copy required); standalone repo per plugin (extra repo management overhead).
+
+### 2026-06-24: Plugin commands from subdirectory installs are namespace-prefixed
+**Decision:** Accept `/memory-bank:using-memory-bank` instead of `/using-memory-bank`.
+**Why:** Plugins installed from a marketplace subdirectory (`./memory-bank`) get their commands prefixed by the plugin system. Fixing requires a standalone repo. The prefixed form is consistent with all other `/memory-bank:<op>` commands.
+**Alternatives rejected:** Standalone repo (overhead); remove command file entirely (loses discoverability).
+
+### 2026-06-24: CLAUDE-instruction as marketplace, memory-bank as plugin within it
+**Decision:** `phuc16/CLAUDE-instruction` is the marketplace; `memory-bank/` is a plugin within it. Root `.claude-plugin/marketplace.json` lists all plugins.
+**Why:** Avoids creating a separate repo for each plugin. Allows future plugins (spec-generator, etc.) to be added to the same marketplace.
+**Alternatives rejected:** One repo per plugin (too many repos for personal tooling).
+
 ### 2026-06-15: CLAUDE.md structure for a documentation-only repo
 **Decision:** CLAUDE.md summarizes the two guides' purposes, the Memory Bank file table, and skill invocation interface — no build/test commands since there are none.
 **Why:** `/init` scans codebase; a pure-markdown repo has no commands to document, so the value is in the architectural summary (what each file is for, how the skill works).
