@@ -1,0 +1,11 @@
+{
+  "name": "memory-bank",
+  "version": "1.0.0",
+  "description": "Memory Bank manager — read, update, and summarize project memory files",
+  "author": {
+    "name": "Trương Hoàng Phúc"
+  },
+  "license": "MIT",
+  "skills": "./skills",
+  "commands": ["./.claude/commands"]
+}
